@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="a92d7c7b-a775-458c-a0e6-86097a6bec87" name="RPi HES 09">
+        <fileTransfer rootFolder="/home/pi" accessType="SFTP" host="GreyPi009.hevs.ch" port="22" sshConfigId="c0535ae2-f0af-45fa-b387-112b2d47a3a2" sshConfig="pi@GreyPi009.hevs.ch:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
