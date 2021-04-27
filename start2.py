@@ -6,3 +6,4 @@ while True:
     temperature_in_all_units = sensor1.get_temperature()
     print(temperature_in_all_units)
     time.sleep(1)
+    #Petit commentaire
