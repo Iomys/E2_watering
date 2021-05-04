@@ -2,6 +2,13 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" serverName="pi@GreyPi009.hevs.ch:22 key" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
+      <paths name="GreyPi 009 Local">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_539" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="RPi HES 09">
         <serverdata>
           <mappings>
