@@ -1,4 +1,5 @@
 # Import the needed modules
+import grove_rgb_lcd
 import grovepi
 import time
 from grove_rgb_lcd import *
@@ -44,6 +45,8 @@ while True:
         t = str(temperature_in_C)
         setText("Light_value=" + l + " Temp=" + t + "C")
         time.sleep(1)
+        # Screen color
+        grove_rgb_lcd.setRGB(244,0,0)
 
 
         if light_value < thresholdL:
