@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig host="GreyPi001.hevs.ch" id="7ffdfba3-ec45-4dbb-8fed-23ddf5e2cf2d" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="pi" />
-    </configs>
-  </component>
-</project>

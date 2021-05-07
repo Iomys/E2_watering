@@ -3,7 +3,7 @@ import time
 sensor1 = W1ThermSensor()
 
 while True:
-    temperature_in_all_units = sensor1.get_temperature()
-    print(temperature_in_all_units)
+    temperature_in_C = sensor1.get_temperature()
+    print(temperature_in_C)
     time.sleep(1)
     #Petit commentaire
