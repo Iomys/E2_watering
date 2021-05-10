@@ -1,4 +1,4 @@
-# E2_wattering
+# E2_watering
 Projet d'informatique du semestre 2 à la HES-SO Valais/Wallis en énergies et techniques environnementales.
 
 ## Requirements 
