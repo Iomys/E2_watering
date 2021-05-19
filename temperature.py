@@ -1,4 +1,4 @@
-from w1thermsensor import W1ThermSensor, Unit
+from w1thermsensor import W1ThermSensor
 import time
 sensor1 = W1ThermSensor()
 
