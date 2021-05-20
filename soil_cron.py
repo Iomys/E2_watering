@@ -1,6 +1,6 @@
 from datetime import datetime
 import csv
-from main import Measures
+from classes import Measures
 mes = Measures()
 print("Iinit")
 with open('/home/pi/E2_watering/report/soil_moisture.csv', 'a', newline='') as csvfile:
