@@ -106,19 +106,6 @@ class Measures():
             self.aht = AHT10(1)  #Capteur de température et d'humidité I2C
         except:
             pass
-    # def dht_temp(self):
-    #     try:
-    #         [temp, hum] = grovepi.dht(self.dht_port, 0)
-    #         return temp
-    #     except (IOError, TypeError) as e:
-    #         logging.error(f"Erreur avec dht11 : \n {e}")
-    #
-    # def dht_hum(self):
-    #     try:
-    #         [temp, hum] = grovepi.dht(self.dht_port, 0)
-    #         return hum
-    #     except (IOError, TypeError) as e:
-    #         logging.error(f"Erreur avec dht11 : \n {e}")
 
     def soil_hum_chin(self):
         try:
@@ -156,30 +143,4 @@ class Measures():
         except Exception as e:
             logging.error(f"Erreur dans la lecture de l'humidité AHT10 : \n {e}")
 
-# b1 = Button(ledPin=2, buttonPin=3)
-# while True:
-#     b1.read_state()
-#     time.sleep(0.001)
-# mes = Measures()
-# print("HES \tChinois \tCapacitif")
-# while True:
-#     with open('/home/pi/E2_watering/report/soil_moisture.csv', 'a', newline='') as csvfile:
-#         output = [datetime.now().isoformat(), mes.soil_hum_chin(), mes.soil_hum_hes(), mes.soil_hum_cap()]
-#         writer = csv.writer(csvfile, delimiter=',',
-#                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
-#         writer.writerow(output)
-#     print(output)
-#     time.sleep(1*60*5)
 
-# mes = Measures()
-
-# with open('/home/pi/E2_watering/report/soil_moisture.csv', 'a', newline='') as csvfile:
-#     print("1")
-#
-#     output = [datetime.now().isoformat(), mes.soil_hum_chin(), mes.soil_hum_hes(), mes.soil_hum_cap()]
-#     print('2')
-#     writer = csv.writer(csvfile, delimiter=',',
-#                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
-#     print('3')
-#     writer.writerow(output)
-#     print(output)
