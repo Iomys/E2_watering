@@ -32,7 +32,7 @@ def build_payload(variable_1, variable_2, variable_3):
 def post_request(payload):
     # Creates the headers for the HTTP requests
     url = "https://industrial.api.ubidots.com"
-    url = "{}/api/v1.6/devices/{}".format(url, DEVICE_LABEL)
+    url = "{}/dashboard/v1.6/devices/{}".format(url, DEVICE_LABEL)
     headers = {"X-Auth-Token": TOKEN, "Content-Type": "application/json"}
 
     # Makes the HTTP requests
