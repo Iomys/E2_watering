@@ -31,7 +31,7 @@ thresholdT = 30
 # Initial delay of 1 second
 time.sleep(1)
 
-while True:
+while True: 
     try:
         # Read the light level
         light_value = grovepi.analogRead(light_sensor)
