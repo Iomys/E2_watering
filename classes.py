@@ -1,6 +1,7 @@
 import time
 import grovepi
 import logging
+import numpy as np
 from AHT10 import AHT10
 from datetime import datetime, timedelta  # Gestion de date et heure
 import csv
@@ -19,6 +20,7 @@ class Led():
         self.inverted = inverted
         grovepi.pinMode(self.pin, "OUTPUT") #Initialisation du port
         self.off()  #La LED commence éteinte
+
     def on(self):
         """Allumer la LED"""
         if self.inverted:
@@ -144,3 +146,98 @@ class Measures():
             logging.error(f"Erreur dans la lecture de l'humidité AHT10 : \n {e}")
 
 
+class Arrosage():
+    state = False
+
+    #Définition des seuils d'humidité
+    hum_max = 1024
+    hum_cible = 2/3 * hum_max
+    hum_min = 1/4 * hum_max
+
+    # Initialisation d'un tableau pour sauvegarder les mesures.
+    mean_size = 60
+    historic_hum = np.zeros(mean_size)
+    historic_hum[:] = np.nan
+
+    def __init__(self, relayPin: int, led: Led, measureClass: Measures, btn1: Button, btn2: Button):
+        """
+
+        :param relayPin: pin d'entrée pour le relais contrôlant l'arrosage automatique.
+        :param led: Classe de la Led qui s'allume quand l'arrosage est en fonction (LED2 sur le schéma)
+        :param measureClass: classe de mesure du projet
+        """
+        self.btn1 = btn1
+        self.btn2 = btn2
+
+        self.led = led
+        self.measureClass = measureClass
+        self.relayPin = relayPin
+        grovepi.pinMode(self.relayPin, "OUTPUT")
+        self.off()
+
+
+    def on(self):
+        """Allumer le relais (donc l'arrosage)"""
+        grovepi.digitalWrite(self.relayPin, 1)
+        self.led.on()
+        self.state = True
+
+    def off(self):
+        """Eteindre le relais (donc l'arrosage)"""
+        self.led.off()
+        grovepi.digitalWrite(self.relayPin, 0)
+        self.state = False
+
+    def get_humidity(self):
+        """
+        Mesure de l'humidité, vérification de la validité de cette mesure.
+        Retourne la moyenne des 50 dernières mesures.
+
+        :return: string : "critical", "low" or "good"
+        """
+        mesure = self.measureClass.soil_hum_cap1()
+
+        # Supression valeur trop grande
+        while mesure > 1024:
+            mesure = self.measureClass.soil_hum_cap1()
+        self.historic_hum = np.roll(self.historic_hum,1)  #Décalage du tableau vers la droite
+        self.historic_hum[0] = mesure # On ajoute la dernière mesure
+        # Détection d'une possible valeur erronée isolée
+        gapMax = 20
+        if abs(self.historic_hum[1] - (self.historic_hum[0]+self.historic_hum[2])/2) > gapMax:
+            # On remplace la valeur erronée par la moyenne des deux valeurs autour
+            self.historic_hum[1] = self.historic_hum[2]
+
+        # Moyenne des dernières valeurs de l'humidité pour "lisser la courbe"
+        humidity = np.mean(self.historic_hum[1:])
+        self.humidity = humidity
+        return humidity
+
+    def check_humidity(self):
+        """
+        Vérifie si le niveau d'humidité est acceptable où non. Attention à obtenir la valeur de l'humiditié avec la
+        fonction get_humidity avant.
+        :return:
+        """
+        if self.humidity <= self.hum_min:
+            return "critical"
+        elif self.humidity <= self.hum_cible:
+            return "low"
+        else:
+            return "good"
+
+    def is_btn_pressed(self, num):
+        if num==1:
+            # Détection de l'appui sur le bouton 1 (seulement état montant)
+            if self.btn1.state == False and self.btn1.read_state() == True:
+                return True
+            else:
+                return False
+        elif num==2:
+            # Détection de l'appui sur le bouton 2 (seulement état montant)
+            if self.btn2.state == False and self.btn2.read_state() == True:
+                return True
+            else:
+                return False
+        else:
+            raise
