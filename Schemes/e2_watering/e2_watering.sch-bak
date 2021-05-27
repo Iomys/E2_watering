@@ -182,8 +182,6 @@ Wire Wire Line
 	2900 3400 2900 4750
 Wire Wire Line
 	2500 3400 2900 3400
-Wire Wire Line
-	2600 3750 3000 3750
 Connection ~ 2600 3750
 Wire Wire Line
 	2500 3850 2700 3850
@@ -407,7 +405,7 @@ D3
 Text Label 1350 5350 1    50   ~ 0
 D2
 Text Label 2350 5350 2    50   ~ 0
-D7
+D6
 Text Label 1550 4800 1    50   ~ 0
 D4
 Wire Notes Line

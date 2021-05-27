@@ -405,7 +405,7 @@ D3
 Text Label 1350 5350 1    50   ~ 0
 D2
 Text Label 2350 5350 2    50   ~ 0
-D6
+D5
 Text Label 1550 4800 1    50   ~ 0
 D4
 Wire Notes Line
