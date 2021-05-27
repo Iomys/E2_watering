@@ -10,7 +10,7 @@ from w1thermsensor import W1ThermSensor
 from pyowm import OWM  # OpenWheatherMap package
 from pyowm.utils.config import get_config_from
 
-class Led():
+class Led:
     """
     Leds du tableau de commande
     """
@@ -46,7 +46,7 @@ class Led():
         else:
             self.on()
 
-class Button():
+class Button:
     """
     Bouton possédant une led sur le boitier de commande du raspberry pi
     """
@@ -54,8 +54,7 @@ class Button():
     def __init__(self, ledPin, buttonPin, ledInverted=True):
         self.led = Led(ledPin, ledInverted)
         self.pin = buttonPin
-        #grovepi.set_pin_interrupt(self.pin)
-        #grovepi.set_pin_interrupt(3, grovepi.COUNT_CHANGES, grovepi.FALLING, 100)
+
         grovepi.pinMode(self.pin, "INPUT")
     def read_state(self):
         state = grovepi.digitalRead(self.pin)
@@ -66,7 +65,8 @@ class Button():
         self.state = state
         print(state)
         return state
-class Wheather():
+    
+class Wheather:
 
     def __init__(self, api_key='029ee2f1a08c0add6d9ce67aa965f04c', lat=46.46790, long=6.86036):
         config_dict = get_config_from('wheather_api_config.json')
@@ -94,7 +94,7 @@ class Wheather():
         return sum(self.rain()[0:1])
 
 
-class Measures():
+class Measures:
     dht_port = 4
 
     hum_chin_port = 0
@@ -146,7 +146,7 @@ class Measures():
             logging.error(f"Erreur dans la lecture de l'humidité AHT10 : \n {e}")
 
 
-class Arrosage():
+class Arrosage:
     state = False
 
     #Définition des seuils d'humidité
@@ -217,7 +217,7 @@ class Arrosage():
         """
         Vérifie si le niveau d'humidité est acceptable où non. Attention à obtenir la valeur de l'humiditié avec la
         fonction get_humidity avant.
-        :return:
+        :return: Texte "critical", "low" ou "good" selon l'humidité du sol.
         """
         if self.humidity <= self.hum_min:
             return "critical"
@@ -227,6 +227,10 @@ class Arrosage():
             return "good"
 
     def is_btn_pressed(self, num):
+        """
+        :param num: Indice du bouton à observer
+        :return: Retourne True lorsque le bouton choisi est appuyé
+        """
         if num==1:
             # Détection de l'appui sur le bouton 1 (seulement état montant)
             if self.btn1.state == False and self.btn1.read_state() == True:
