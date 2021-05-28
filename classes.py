@@ -148,7 +148,8 @@ class Measures:
 
 class Arrosage:
     state = False
-
+    auto = True
+    forced = False
     #Définition des seuils d'humidité
     hum_max = 1024
     hum_cible = 2/3 * hum_max
@@ -245,3 +246,13 @@ class Arrosage:
                 return False
         else:
             raise
+
+    def activate(self):
+        self.auto = True
+
+    def deactivate(self):
+        self.auto = False
+        self.off()
+
+    def auto_loop(self):
+        pass
