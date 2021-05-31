@@ -63,7 +63,7 @@ class Button:
         else:
             self.led.off()
         self.state = state
-        print(state)
+        #print(state)
         return state
     
 class Wheather:
@@ -91,7 +91,7 @@ class Wheather:
     def rain_5_day(self):
         return sum(self.rain())
     def rain_next_day(self):
-        return sum(self.rain()[0:1])
+        return sum(self.rain()[0:2])
 
 
 class Measures:
@@ -100,6 +100,7 @@ class Measures:
     hum_chin_port = 0
     hum_cap1_port = 1
     hum_cap2_port = 2
+    hum_cap0_port = 0
 
 
     def __init__(self):
@@ -119,13 +120,19 @@ class Measures:
         try:
             return grovepi.analogRead(self.hum_cap1_port)
         except (IOError, TypeError) as e:
-            logging.error(f"Erreur avec Capteur d'humidité capacitif : \n {e}")
+            logging.error(f"Erreur avec Capteur d'humidité capacitif 1: \n {e}")
 
     def soil_hum_cap2(self):
         try:
             return grovepi.analogRead(self.hum_cap2_port)
         except (IOError, TypeError) as e:
-            logging.error(f"Erreur avec Capteur d'humidité HES : \n {e}")
+            logging.error(f"Erreur avec Capteur d'humidité capacitif 2 : \n {e}")
+
+    def soil_hum_cap0(self):
+        try:
+            return grovepi.analogRead(self.hum_cap0_port)
+        except (IOError, TypeError) as e:
+            logging.error(f"Erreur avec Capteur d'humidité capacitif 3 : \n {e}")
 
     def soil_temp(self):
         try:
@@ -150,11 +157,17 @@ class Arrosage:
     state = False
     auto = True
     forced = False
-    #Définition des seuils d'humidité
-    hum_max = 1024
-    hum_cible = 2/3 * hum_max
-    hum_min = 1/4 * hum_max
 
+    #Définition des seuils d'humidité
+    hum_max = 280 # 100% d'humidité
+    hum_min = 500 # 0% humidité
+    hum_to_water = 0.8
+    hum_cible = 2/3
+    hum_critical = 1/4
+
+    rain_max = 20 # Seuil de pluie prévue pour annuler l'arrosage
+
+    humidity = None
     # Initialisation d'un tableau pour sauvegarder les mesures.
     mean_size = 60
     historic_hum = np.zeros(mean_size)
@@ -167,14 +180,18 @@ class Arrosage:
         :param led: Classe de la Led qui s'allume quand l'arrosage est en fonction (LED2 sur le schéma)
         :param measureClass: classe de mesure du projet
         """
+        # Passage des paramètres
         self.btn1 = btn1
         self.btn2 = btn2
-
         self.led = led
         self.measureClass = measureClass
         self.relayPin = relayPin
+
+        #Initialisations diverses
+        self.wheather = Wheather()
         grovepi.pinMode(self.relayPin, "OUTPUT")
         self.off()
+
 
 
     def on(self):
@@ -232,13 +249,13 @@ class Arrosage:
         :param num: Indice du bouton à observer
         :return: Retourne True lorsque le bouton choisi est appuyé
         """
-        if num==1:
+        if num == 1:
             # Détection de l'appui sur le bouton 1 (seulement état montant)
             if self.btn1.state == False and self.btn1.read_state() == True:
                 return True
             else:
                 return False
-        elif num==2:
+        elif num == 2:
             # Détection de l'appui sur le bouton 2 (seulement état montant)
             if self.btn2.state == False and self.btn2.read_state() == True:
                 return True
@@ -246,6 +263,21 @@ class Arrosage:
                 return False
         else:
             raise
+
+    def humidity_to_percent(self, humidity):
+        """
+        Fonction convertissant la valeur analogique de l'humidité du sol en pourcentage d'humidité.
+        :param humidity: valeur analogique de l'humidité
+        :return: pourcentage d'humidité du sol.
+        """
+        if self.hum_min > self.hum_max:
+            # Cas ou plus il y a d'humidité, moins le capteur affiche une valeur grande.
+            humidity = humidity - self.hum_max
+            percents = 1 - humidity/(self.hum_min - self.hum_max)
+        else:
+            humidity = humidity - self.hum_min
+            percents = humidity / (self.hum_max - self.hum_min)
+        return percents
 
     def activate(self):
         self.auto = True
@@ -255,4 +287,15 @@ class Arrosage:
         self.off()
 
     def auto_loop(self):
-        pass
+        # On lis la valeur du capteur d'humidité convertie en pourcents
+        hum = self.humidity_to_percent(self.get_humidity())
+
+        # Si l'humidité est plus grande que le seuil d'arret voulu pour l'arrosage
+        if hum > self.hum_to_water:
+            self.off()
+        # Si l'humidité est faible et qu'il ne pleut pas le lendemain
+        elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max:
+            self.on()
+        # Si l'muhidité est critique, on arrosage meme s'il annonce de la pluie le lendemain
+        elif hum < self.hum_critical:
+            self.on()
