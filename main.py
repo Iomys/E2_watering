@@ -18,6 +18,7 @@ while True:
     if arrosage.auto:
         arrosage.auto_loop()
 
+
     # # Forçage de l'arrosage automatique (Bouton un)
     # if arrosage.is_btn_pressed(2):
     #     print("Button 2")

@@ -159,19 +159,20 @@ class Arrosage:
     forced = False
 
     #Définition des seuils d'humidité
-    hum_max = 280 # 100% d'humidité
-    hum_min = 500 # 0% humidité
+    hum_max = 280  # 100% d'humidité
+    hum_min = 500  # 0% humidité
     hum_to_water = 0.8
     hum_cible = 2/3
     hum_critical = 1/4
 
-    rain_max = 20 # Seuil de pluie prévue pour annuler l'arrosage
+    rain_max = 20  # Seuil de pluie prévue pour annuler l'arrosage
 
     humidity = None
     # Initialisation d'un tableau pour sauvegarder les mesures.
     mean_size = 60
     historic_hum = np.zeros(mean_size)
     historic_hum[:] = np.nan
+    last_loop = datetime(0, 0, 0)  # Au démarrage la boucle sera directement activée
 
     def __init__(self, relayPin: int, led: Led, measureClass: Measures, btn1: Button, btn2: Button):
         """
@@ -187,12 +188,11 @@ class Arrosage:
         self.measureClass = measureClass
         self.relayPin = relayPin
 
-        #Initialisations diverses
+        # Initialisations diverses
         self.wheather = Wheather()
         grovepi.pinMode(self.relayPin, "OUTPUT")
-        self.off()
 
-
+        self.off()  # L'arrosage commence éteint
 
     def on(self):
         """Allumer le relais (donc l'arrosage)"""
@@ -218,8 +218,8 @@ class Arrosage:
         # Supression valeur trop grande
         while mesure > 1024:
             mesure = self.measureClass.soil_hum_cap1()
-        self.historic_hum = np.roll(self.historic_hum,1)  #Décalage du tableau vers la droite
-        self.historic_hum[0] = mesure # On ajoute la dernière mesure
+        self.historic_hum = np.roll(self.historic_hum,1)  # Décalage du tableau vers la droite
+        self.historic_hum[0] = mesure  # On ajoute la dernière mesure
         # Détection d'une possible valeur erronée isolée
         gapMax = 20
         if abs(self.historic_hum[1] - (self.historic_hum[0]+self.historic_hum[2])/2) > gapMax:
@@ -230,19 +230,6 @@ class Arrosage:
         humidity = np.mean(self.historic_hum[1:])
         self.humidity = humidity
         return humidity
-
-    def check_humidity(self):
-        """
-        Vérifie si le niveau d'humidité est acceptable où non. Attention à obtenir la valeur de l'humiditié avec la
-        fonction get_humidity avant.
-        :return: Texte "critical", "low" ou "good" selon l'humidité du sol.
-        """
-        if self.humidity <= self.hum_min:
-            return "critical"
-        elif self.humidity <= self.hum_cible:
-            return "low"
-        else:
-            return "good"
 
     def is_btn_pressed(self, num):
         """
@@ -287,15 +274,17 @@ class Arrosage:
         self.off()
 
     def auto_loop(self):
-        # On lis la valeur du capteur d'humidité convertie en pourcents
-        hum = self.humidity_to_percent(self.get_humidity())
+        # La boucle est activée une seule fois par minute.
+        if datetime.now() - self.last_loop > timedelta(minutes=1):
+            # On lis la valeur du capteur d'humidité convertie en pourcents
+            hum = self.humidity_to_percent(self.get_humidity())
 
-        # Si l'humidité est plus grande que le seuil d'arret voulu pour l'arrosage
-        if hum > self.hum_to_water:
-            self.off()
-        # Si l'humidité est faible et qu'il ne pleut pas le lendemain
-        elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max:
-            self.on()
-        # Si l'muhidité est critique, on arrosage meme s'il annonce de la pluie le lendemain
-        elif hum < self.hum_critical:
-            self.on()
+            # Si l'humidité est plus grande que le seuil d'arret voulu pour l'arrosage
+            if hum > self.hum_to_water:
+                self.off()
+            # Si l'humidité est faible et qu'il ne pleut pas le lendemain
+            elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max:
+                self.on()
+            # Si l'muhidité est critique, on arrosage meme s'il annonce de la pluie le lendemain
+            elif hum < self.hum_critical:
+                self.on()
