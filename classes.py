@@ -172,7 +172,7 @@ class Arrosage:
     mean_size = 60
     historic_hum = np.zeros(mean_size)
     historic_hum[:] = np.nan
-    last_loop = datetime(0, 0, 0)  # Au démarrage la boucle sera directement activée
+    last_loop = datetime(2021, 1, 1)  # Au démarrage la boucle sera directement activée
 
     def __init__(self, relayPin: int, led: Led, measureClass: Measures, btn1: Button, btn2: Button):
         """

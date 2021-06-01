@@ -131,3 +131,5 @@ dmypy.json
 # Pycharm Folder
 .idea/
 .idea
+
+report/soil_moisture.csv
