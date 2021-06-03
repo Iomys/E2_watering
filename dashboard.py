@@ -12,7 +12,7 @@ class Dashboard:
     temp_soil = '60a648081d847205570d4f6a'
     hum_rpi = '60a648061d84720586158528'
     hum_soil0 = '60a648091d847205b05a2494'
-    hum_soil1 ='60a6480a1d847205e954744f'
+    hum_soil1 = '60a6480a1d847205e954744f'
     hum_soil2 = '60a6480c1d847205e9547450'
 
     def __init__(self):
@@ -33,18 +33,34 @@ class Dashboard:
 
         :return:
         """
+        value = self.variable_auto_arrosage.get_values(1)[0]['value']
+        if value:
+            return True
+        else:
+            return False
 
+    def get_arrosage_state(self):
+        """
 
-# temp_rpi = api.get_variable('60a647851d8472029fed5c66')
-# temp_soil = api.get_variable('60a648081d847205570d4f6a')
-#
-# temp_rpi.save_value({'value':rpi.aht10_temp()})
-# temp_soil.save_value({'value':rpi.ds18b20.get_temperature()})
+        :return:
+        """
+        value = self.variable_auto_arrosage.get_values(1)[0]['value']
+        if value:
+            return True
+        else:
+            return False
 
+    def set_auto_state(self, state):
+        if state:
+            output = 1
+        else:
+            output = 0
+        self.variable_auto_arrosage.save_value({'value': output})
 
+    def set_arrosage_state(self, state):
+        if state:
+            output = 1
+        else:
+            output = 0
+        self.variable_arrosage_mnt.save_value({'value': output})
 
-
-
-while True:
-    collect_to_dashboard()
-    time.sleep(60)

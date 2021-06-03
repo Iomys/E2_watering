@@ -1,9 +1,9 @@
-import time
+
 import grovepi
 import logging
 import numpy as np
 from AHT10 import AHT10
-from datetime import datetime, timedelta  # Gestion de date et heure
+from datetime import datetime, timedelta, time  # Gestion de date et heure
 import csv
 from w1thermsensor import W1ThermSensor
 
@@ -158,18 +158,20 @@ class Arrosage:
     auto = True
     forced = False
 
-    #Définition des seuils d'humidité
+    # Définition des seuils d'humidité
     hum_max = 280  # 100% d'humidité
     hum_min = 500  # 0% humidité
     hum_to_water = 0.8
     hum_cible = 2/3
     hum_critical = 1/4
 
+
     rain_max = 20  # Seuil de pluie prévue pour annuler l'arrosage
+    forced_start = datetime(2021, 1, 1)
 
     humidity = None
     # Initialisation d'un tableau pour sauvegarder les mesures.
-    mean_size = 60
+    mean_size = 20
     historic_hum = np.zeros(mean_size)
     historic_hum[:] = np.nan
     last_loop = datetime(2021, 1, 1)  # Au démarrage la boucle sera directement activée
@@ -182,6 +184,7 @@ class Arrosage:
         :param measureClass: classe de mesure du projet
         """
         # Passage des paramètres
+
         self.btn1 = btn1
         self.btn2 = btn2
         self.led = led
@@ -213,11 +216,11 @@ class Arrosage:
 
         :return: string : "critical", "low" or "good"
         """
-        mesure = self.measureClass.soil_hum_cap1()
+        mesure = self.measureClass.soil_hum_cap2()
 
         # Supression valeur trop grande
         while mesure > 1024:
-            mesure = self.measureClass.soil_hum_cap1()
+            mesure = self.measureClass.soil_hum_cap2()
         self.historic_hum = np.roll(self.historic_hum,1)  # Décalage du tableau vers la droite
         self.historic_hum[0] = mesure  # On ajoute la dernière mesure
         # Détection d'une possible valeur erronée isolée
@@ -275,16 +278,45 @@ class Arrosage:
 
     def auto_loop(self):
         # La boucle est activée une seule fois par minute.
-        if datetime.now() - self.last_loop > timedelta(minutes=1):
+        if datetime.now() - self.last_loop > timedelta(seconds=20):
+            self.last_loop = datetime.now()
             # On lis la valeur du capteur d'humidité convertie en pourcents
             hum = self.humidity_to_percent(self.get_humidity())
-
+            print(datetime.now(), ":", hum, ", ", self.measureClass.soil_hum_cap2(), self.humidity_to_percent(self.measureClass.soil_hum_cap2()))
             # Si l'humidité est plus grande que le seuil d'arret voulu pour l'arrosage
             if hum > self.hum_to_water:
                 self.off()
-            # Si l'humidité est faible et qu'il ne pleut pas le lendemain
-            elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max:
+                print("Humidité au max, arrosage éteint")
+            # Si l'humidité est faible et qu'il ne pleut pas le lendemain et que c'est la nuit
+            elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max and \
+                    time(18, 00) < datetime.now().time() < time(8, 00):
                 self.on()
+                print("Allumage de l'arrosage : pas de pluie prévue")
             # Si l'muhidité est critique, on arrosage meme s'il annonce de la pluie le lendemain
             elif hum < self.hum_critical:
+                print("Allumage de l'arrosage : sol très sec !")
                 self.on()
+
+    def initMeasures(self):
+        """
+        A l'initialisation du programme, on prend directement le même nombre de mesures que le nombre sur lequel on
+        effectue la moyenne flotante, afin d'avoir un nombre dès la première mesure et non nan.
+        :return: Nothing
+        """
+        for i in range(self.mean_size):
+            print(self.get_humidity())
+
+    def forced_loop(self):
+        if datetime.now() - self.last_loop > timedelta(seconds=20):
+            self.last_loop = datetime.now()
+            # On lis la valeur du capteur d'humidité convertie en pourcents
+            hum = self.humidity_to_percent(self.get_humidity())
+            if hum > self.hum_to_water:
+                self.off()
+                print("Humidité au max, arrosage éteint")
+
+        if datetime.now() - self.forced_start > timedelta(minutes=45):
+            self.off()
+            print("Arrosage pendant 45 min, extinction")
+
+
