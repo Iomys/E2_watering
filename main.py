@@ -39,6 +39,7 @@ while True:
         if not arrosage.forced:
 
             arrosage.forced = True
+            arrosage.on()
             arrosage.forced_start = datetime.now()
         # Extinction de l'arrosage forcé
         else:
