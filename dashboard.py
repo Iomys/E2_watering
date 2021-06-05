@@ -14,19 +14,25 @@ class Dashboard:
     hum_soil0 = '60a648091d847205b05a2494'
     hum_soil1 = '60a6480a1d847205e954744f'
     hum_soil2 = '60a6480c1d847205e9547450'
+    hum_soil_rel = '60b952e71d84720ed547d39e'
 
     def __init__(self):
         self.variable_auto_arrosage = self.api.get_variable("60a651eb1d847239ab0118f6")
-        self.variable_arrosage_mnt = self.api.get_variable("60a651d61d847238a3e72c50")
+        self.variable_arrosage_forced = self.api.get_variable("60a651d61d847238a3e72c50")
+        self.variable_state = self.api.get_variable("60b954ad1d847219408fe399")
 
     def publish_sensors(self):
-        self.api.save_collection([{'variable': self.temp_rpi, 'value': self.rpi.aht10_temp()},
-                                  {'variable': self.hum_rpi, 'value':self.rpi.aht10_hum()},
-                                  {'variable': self.hum_soil0, 'value': self.rpi.soil_hum_chin()},
-                                  {'variable': self.hum_soil1, 'value': self.rpi.soil_hum_cap1()},
-                                  {'variable': self.hum_soil2, 'value': self.rpi.soil_hum_cap2()},
-                                  {'variable': self.temp_soil, 'value': self.rpi.ds18b20.get_temperature()},
-                                  ])
+        try:
+            self.api.save_collection([{'variable': self.temp_rpi, 'value': self.rpi.aht10_temp()},
+                                      {'variable': self.hum_rpi, 'value':self.rpi.aht10_hum()},
+                                      {'variable': self.hum_soil0, 'value': self.rpi.soil_hum_cap0()},
+                                      {'variable': self.hum_soil1, 'value': self.rpi.soil_hum_cap1()},
+                                      {'variable': self.hum_soil2, 'value': self.rpi.soil_hum_cap2()},
+                                      {'variable': self.temp_soil, 'value': self.rpi.ds18b20.get_temperature()},
+                                      {'variable': self.hum_soil_rel, 'value': self.rpi.humidity_to_percent(self.rpi.soil_hum_cap2())},
+                                      ])
+        except:
+            pass
 
     def get_auto_state(self):
         """
@@ -44,7 +50,7 @@ class Dashboard:
 
         :return:
         """
-        value = self.variable_auto_arrosage.get_values(1)[0]['value']
+        value = self.variable_arrosage_forced.get_values(1)[0]['value']
         if value:
             return True
         else:
@@ -62,5 +68,13 @@ class Dashboard:
             output = 1
         else:
             output = 0
-        self.variable_arrosage_mnt.save_value({'value': output})
+        self.variable_state.save_value({'value': output})
+
+    def set_arrosage_forced(self, state):
+        if state:
+            output = 1
+        else:
+            output = 0
+        self.variable_arrosage_forced.save_value({'value': output})
+
 

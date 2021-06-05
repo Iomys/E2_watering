@@ -102,6 +102,9 @@ class Measures:
     hum_cap2_port = 2
     hum_cap0_port = 0
 
+    hum_max = 280  # 100% d'humidité
+    hum_min = 500  # 0% humidité
+
 
     def __init__(self):
         try:
@@ -152,6 +155,21 @@ class Measures:
         except Exception as e:
             logging.error(f"Erreur dans la lecture de l'humidité AHT10 : \n {e}")
 
+    def humidity_to_percent(self, humidity):
+        """
+        Fonction convertissant la valeur analogique de l'humidité du sol en pourcentage d'humidité.
+        :param humidity: valeur analogique de l'humidité
+        :return: pourcentage d'humidité du sol.
+        """
+        if self.hum_min > self.hum_max:
+            # Cas ou plus il y a d'humidité, moins le capteur affiche une valeur grande.
+            humidity = humidity - self.hum_max
+            percents = 1 - humidity/(self.hum_min - self.hum_max)
+        else:
+            humidity = humidity - self.hum_min
+            percents = humidity / (self.hum_max - self.hum_min)
+        return percents
+
 
 class Arrosage:
     state = False
@@ -159,8 +177,6 @@ class Arrosage:
     forced = False
 
     # Définition des seuils d'humidité
-    hum_max = 280  # 100% d'humidité
-    hum_min = 500  # 0% humidité
     hum_to_water = 0.8
     hum_cible = 2/3
     hum_critical = 1/4
@@ -221,7 +237,7 @@ class Arrosage:
         # Supression valeur trop grande
         while mesure > 1024:
             mesure = self.measureClass.soil_hum_cap2()
-        self.historic_hum = np.roll(self.historic_hum,1)  # Décalage du tableau vers la droite
+        self.historic_hum = np.roll(self.historic_hum, 1)  # Décalage du tableau vers la droite
         self.historic_hum[0] = mesure  # On ajoute la dernière mesure
         # Détection d'une possible valeur erronée isolée
         gapMax = 20
@@ -242,32 +258,22 @@ class Arrosage:
         if num == 1:
             # Détection de l'appui sur le bouton 1 (seulement état montant)
             if self.btn1.state == False and self.btn1.read_state() == True:
-                return True
+                output = True
             else:
-                return False
+                output = False
+            self.btn1.read_state()
         elif num == 2:
             # Détection de l'appui sur le bouton 2 (seulement état montant)
             if self.btn2.state == False and self.btn2.read_state() == True:
-                return True
+                output = True
             else:
-                return False
+                output = False
+
+            self.btn1.read_state()
         else:
             raise
 
-    def humidity_to_percent(self, humidity):
-        """
-        Fonction convertissant la valeur analogique de l'humidité du sol en pourcentage d'humidité.
-        :param humidity: valeur analogique de l'humidité
-        :return: pourcentage d'humidité du sol.
-        """
-        if self.hum_min > self.hum_max:
-            # Cas ou plus il y a d'humidité, moins le capteur affiche une valeur grande.
-            humidity = humidity - self.hum_max
-            percents = 1 - humidity/(self.hum_min - self.hum_max)
-        else:
-            humidity = humidity - self.hum_min
-            percents = humidity / (self.hum_max - self.hum_min)
-        return percents
+        return output
 
     def activate(self):
         self.auto = True
@@ -278,11 +284,11 @@ class Arrosage:
 
     def auto_loop(self):
         # La boucle est activée une seule fois par minute.
-        if datetime.now() - self.last_loop > timedelta(seconds=20):
+        if datetime.now() - self.last_loop > timedelta(minutes=2):
             self.last_loop = datetime.now()
             # On lis la valeur du capteur d'humidité convertie en pourcents
-            hum = self.humidity_to_percent(self.get_humidity())
-            print(datetime.now(), ":", hum, ", ", self.measureClass.soil_hum_cap2(), self.humidity_to_percent(self.measureClass.soil_hum_cap2()))
+            hum = self.measureClass.humidity_to_percent(self.get_humidity())
+            print(datetime.now(), ":", hum, ", ", self.measureClass.soil_hum_cap2(), self.measureClass.humidity_to_percent(self.measureClass.soil_hum_cap2()))
             # Si l'humidité est plus grande que le seuil d'arret voulu pour l'arrosage
             if hum > self.hum_to_water:
                 self.off()
@@ -307,16 +313,20 @@ class Arrosage:
             print(self.get_humidity())
 
     def forced_loop(self):
-        if datetime.now() - self.last_loop > timedelta(seconds=20):
+        if datetime.now() - self.last_loop > timedelta(minutes=1):
             self.last_loop = datetime.now()
             # On lis la valeur du capteur d'humidité convertie en pourcents
-            hum = self.humidity_to_percent(self.get_humidity())
+            hum = self.measureClass.humidity_to_percent(self.get_humidity())
             if hum > self.hum_to_water:
                 self.off()
+                self.auto = True
+                self.forced = False
                 print("Humidité au max, arrosage éteint")
 
         if datetime.now() - self.forced_start > timedelta(minutes=45):
             self.off()
+            self.auto = True
+            self.forced = False
             print("Arrosage pendant 45 min, extinction")
 
 
