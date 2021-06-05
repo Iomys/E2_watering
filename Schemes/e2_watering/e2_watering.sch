@@ -36,17 +36,6 @@ F 3 "~" H 2050 5650 50  0001 C CNN
 	-1   0    0    -1  
 $EndComp
 $Comp
-L Sensor_perso:CapacitiveSoilMoistureSensor U2
-U 1 1 60A15B21
-P 7650 2150
-F 0 "U2" H 7950 2200 50  0000 C CNN
-F 1 "CapacitiveSoilMoistureSensor" H 8450 2300 50  0000 C CNN
-F 2 "" H 7950 2400 50  0001 C CNN
-F 3 "" H 7950 2400 50  0001 C CNN
-	1    7650 2150
-	1    0    0    -1  
-$EndComp
-$Comp
 L Sensor_perso:CapacitiveSoilMoistureSensor U3
 U 1 1 60A1694C
 P 7650 2950
@@ -198,20 +187,14 @@ Wire Wire Line
 	2500 2400 2950 2400
 Entry Wire Line
 	2950 2400 3050 2300
-Wire Bus Line
-	3050 2100 6700 2100
 Wire Wire Line
 	2500 2500 2950 2500
 Wire Wire Line
 	2500 2600 2950 2600
-Wire Wire Line
-	2500 3100 3150 3100
-Wire Wire Line
-	3150 3100 3150 2600
 Entry Wire Line
 	3050 2500 2950 2600
 Entry Wire Line
-	3050 2500 3150 2600
+	3050 2100 2950 2000
 Entry Wire Line
 	3050 2400 2950 2500
 Entry Wire Line
@@ -301,12 +284,7 @@ Wire Wire Line
 Wire Wire Line
 	6600 3600 7350 3600
 Wire Wire Line
-	7350 2950 6600 2950
-Connection ~ 6600 2950
-Wire Wire Line
 	6600 2950 6600 3600
-Wire Wire Line
-	6600 2150 7350 2150
 Wire Wire Line
 	7350 2250 7350 2350
 Wire Wire Line
@@ -327,11 +305,6 @@ Wire Wire Line
 Wire Wire Line
 	7250 1750 7250 2050
 Connection ~ 7250 2050
-Wire Wire Line
-	7650 1150 6600 1150
-Wire Wire Line
-	6600 1150 6600 2150
-Connection ~ 6600 2150
 Text Label 6600 2550 1    50   ~ 0
 5V
 Text Label 7050 3400 1    50   ~ 0
@@ -340,8 +313,8 @@ Text Label 7150 3050 1    50   ~ 0
 A1
 Text Label 7350 2350 1    50   ~ 0
 A2
-Text Label 6800 1850 3    50   ~ 0
-D7
+Text Label 6800 1850 0    50   ~ 0
+D4-RPI
 Entry Wire Line
 	6700 2550 6800 2650
 Wire Wire Line
@@ -414,8 +387,6 @@ Wire Notes Line
 	9100 3900 9100 1050
 Wire Notes Line
 	9100 1050 6500 1050
-Wire Notes Line
-	6500 1050 6500 3900
 Text Notes 7500 1000 0    50   ~ 0
 Circuit de mesure\n
 Wire Notes Line
@@ -428,6 +399,65 @@ Wire Notes Line
 	900  1750 3900 1750
 Text Notes 1800 1700 0    50   ~ 0
 Boîtier de contrôle
+Wire Notes Line
+	6500 1050 6500 3900
+Connection ~ 6600 2950
+Wire Wire Line
+	7350 2950 6600 2950
+Wire Wire Line
+	6600 2150 7350 2150
+Wire Bus Line
+	3050 2100 6700 2100
+Wire Wire Line
+	6600 2150 6600 1300
+Connection ~ 6600 2150
+Wire Wire Line
+	7250 1750 7250 1300
+Connection ~ 7250 1750
+$Comp
+L Device:R R1
+U 1 1 60BACDAC
+P 6750 1300
+F 0 "R1" V 6550 1300 50  0000 C CNN
+F 1 "110" V 6634 1300 50  0000 C CNN
+F 2 "" V 6680 1300 50  0001 C CNN
+F 3 "~" H 6750 1300 50  0001 C CNN
+	1    6750 1300
+	0    1    1    0   
+$EndComp
+$Comp
+L Sensor_perso:CapacitiveSoilMoistureSensor U2
+U 1 1 60A15B21
+P 7650 2150
+F 0 "U2" H 7950 2200 50  0000 C CNN
+F 1 "CapacitiveSoilMoistureSensor" H 8450 2300 50  0000 C CNN
+F 2 "" H 7950 2400 50  0001 C CNN
+F 3 "" H 7950 2400 50  0001 C CNN
+	1    7650 2150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 60BAD7CA
+P 7100 1300
+F 0 "R2" V 6893 1300 50  0000 C CNN
+F 1 "220" V 6984 1300 50  0000 C CNN
+F 2 "" V 7030 1300 50  0001 C CNN
+F 3 "~" H 7100 1300 50  0001 C CNN
+	1    7100 1300
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	6950 1300 6900 1300
+Wire Wire Line
+	6900 1300 6900 1150
+Wire Wire Line
+	6900 1150 7650 1150
+Connection ~ 6900 1300
+Text GLabel 2400 2000 0    50   Input ~ 0
+D4-Rpi
+Wire Wire Line
+	2950 2000 2400 2000
 Wire Wire Line
 	6600 2150 6600 2950
 Wire Bus Line
