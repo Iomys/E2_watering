@@ -53,6 +53,7 @@ while True:
         # Extinction de l'arrosage forcé
         else:
             arrosage.forced = False
+            arrosage.off()
 
 
     # Activation de l'automatisation de l'arrosage (Bouton 1)
@@ -61,8 +62,10 @@ while True:
         # Allumage de l'arrosage forcé
         if not arrosage.auto:
             arrosage.auto = True
+            arrosage.off()
         # Extinction de l'arrosage forcé
         else:
+            arrosage.off()
             arrosage.auto = False
     last_btn1 = btn1_state
     last_btn2 = btn2_state

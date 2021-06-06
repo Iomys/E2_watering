@@ -318,13 +318,13 @@ class Arrosage:
             hum = self.measureClass.humidity_to_percent(self.get_humidity())
             if hum > self.hum_to_water:
                 self.off()
-                self.auto = True
+                #self.auto = True
                 self.forced = False
                 print("Humidité au max, arrosage éteint")
 
         if datetime.now() - self.forced_start > timedelta(minutes=45):
             self.off()
-            self.auto = True
+            #self.auto = True
             self.forced = False
             print("Arrosage pendant 45 min, extinction")
 
