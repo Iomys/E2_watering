@@ -58,12 +58,11 @@ class Button:
         grovepi.pinMode(self.pin, "INPUT")
     def read_state(self):
         state = grovepi.digitalRead(self.pin)
-        if state:
-            self.led.on()
-        else:
-            self.led.off()
+        # if state:
+        #     self.led.on()
+        # else:
+        #     self.led.off()
         self.state = state
-        #print(state)
         return state
     
 class Wheather:
@@ -328,5 +327,7 @@ class Arrosage:
             self.auto = True
             self.forced = False
             print("Arrosage pendant 45 min, extinction")
+
+
 
 

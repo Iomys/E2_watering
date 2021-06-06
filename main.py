@@ -30,10 +30,15 @@ while True:
     # En mode arrosage automatique
     if arrosage.forced:
         arrosage.forced_loop()
+        arrosage.btn2.led.on()
+    else:
+        arrosage.btn2.led.off()
 
-    elif arrosage.auto:
+    if arrosage.auto:
         arrosage.auto_loop()
-
+        arrosage.btn1.led.on()
+    else:
+        arrosage.btn1.led.off()
 
 
     # Gestion des boutons de l'arrosage
@@ -42,13 +47,13 @@ while True:
         print("Appui sur bouton 2")
         # Allumage de l'arrosage forcé
         if not arrosage.forced:
-
             arrosage.forced = True
             arrosage.on()
             arrosage.forced_start = now
         # Extinction de l'arrosage forcé
         else:
             arrosage.forced = False
+
 
     # Activation de l'automatisation de l'arrosage (Bouton 1)
     if btn1_state and not last_btn1:
