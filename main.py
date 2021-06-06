@@ -63,10 +63,13 @@ while True:
     last_btn2 = btn2_state
 
     # Publication des mesures sur la dashboard
-    if now - last_dashboard_connection > timedelta(seconds=10):
+    if now - last_dashboard_connection > timedelta(minutes=3):
+        # Enregistrement des données dans report.csv
         soil_cron.save_to_csv("/home/pi/E2_watering/report/report.csv", arrosage.state)
-    #     dashboard.publish_sensors()
-    #     dashboard.set_arrosage_state(int(arrosage.state))
-    #     dashboard.set_arrosage_forced(int(arrosage.forced))
-    #     dashboard.set_auto_state(int(arrosage.auto))
+        # Publication des mesures
+        dashboard.publish_sensors()
+        # Publication des états
+        dashboard.set_arrosage_state(int(arrosage.state))
+        dashboard.set_arrosage_forced(int(arrosage.forced))
+        dashboard.set_auto_state(int(arrosage.auto))
 

@@ -182,7 +182,7 @@ class Arrosage:
     hum_critical = 1/4
 
 
-    rain_max = 20  # Seuil de pluie prévue pour annuler l'arrosage
+    rain_max = 10 # Seuil de pluie prévue pour annuler l'arrosage
     forced_start = datetime(2021, 1, 1)
 
     humidity = None
@@ -295,7 +295,7 @@ class Arrosage:
                 print("Humidité au max, arrosage éteint")
             # Si l'humidité est faible et qu'il ne pleut pas le lendemain et que c'est la nuit
             elif hum < self.hum_cible and self.wheather.rain_next_day() < self.rain_max and \
-                    time(18, 00) < datetime.now().time() < time(8, 00):
+                    time(18, 00) < datetime.now().time() or datetime.now().time() < time(8, 00):
                 self.on()
                 print("Allumage de l'arrosage : pas de pluie prévue")
             # Si l'muhidité est critique, on arrosage meme s'il annonce de la pluie le lendemain
