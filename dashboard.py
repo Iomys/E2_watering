@@ -29,7 +29,7 @@ class Dashboard:
                                       # {'variable': self.hum_soil1, 'value': self.rpi.soil_hum_cap1()},
                                       # {'variable': self.hum_soil2, 'value': self.rpi.soil_hum_cap2()},
                                       {'variable': self.temp_soil, 'value': self.rpi.ds18b20.get_temperature()},
-                                      {'variable': self.hum_soil_rel, 'value': self.rpi.humidity_to_percent(self.rpi.soil_hum_cap2())},
+                                      {'variable': self.hum_soil_rel, 'value': self.rpi.humidity_to_percent(self.rpi.soil_hum_cap2())*100},
                                       ])
         except:
             pass

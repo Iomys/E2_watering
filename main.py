@@ -64,6 +64,7 @@ while True:
 
     # Publication des mesures sur la dashboard
     if now - last_dashboard_connection > timedelta(minutes=3):
+        last_dashboard_connection = now
         # Enregistrement des données dans report.csv
         soil_cron.save_to_csv("/home/pi/E2_watering/report/report.csv", arrosage.state)
         # Publication des mesures
