@@ -4,7 +4,6 @@ import logging
 import numpy as np
 from AHT10 import AHT10
 from datetime import datetime, timedelta, time  # Gestion de date et heure
-import csv
 from w1thermsensor import W1ThermSensor
 
 from pyowm import OWM  # OpenWheatherMap package
@@ -282,7 +281,7 @@ class Arrosage:
         self.off()
 
     def auto_loop(self):
-        # La boucle est activée une seule fois par minute.
+        # La boucle est activée une seule fois toutes les deux minutes.
         if datetime.now() - self.last_loop > timedelta(minutes=2):
             self.last_loop = datetime.now()
             # On lis la valeur du capteur d'humidité convertie en pourcents
@@ -314,17 +313,15 @@ class Arrosage:
     def forced_loop(self):
         if datetime.now() - self.last_loop > timedelta(minutes=1):
             self.last_loop = datetime.now()
-            # On lis la valeur du capteur d'humidité convertie en pourcents
+            # On lit la valeur du capteur d'humidité convertie en pourcents
             hum = self.measureClass.humidity_to_percent(self.get_humidity())
             if hum > self.hum_to_water:
                 self.off()
-                #self.auto = True
                 self.forced = False
                 print("Humidité au max, arrosage éteint")
 
         if datetime.now() - self.forced_start > timedelta(minutes=45):
             self.off()
-            #self.auto = True
             self.forced = False
             print("Arrosage pendant 45 min, extinction")
 

@@ -1,5 +1,3 @@
-import time
-
 from ubidots import ApiClient
 from classes import Measures
 
