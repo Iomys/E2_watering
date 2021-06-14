@@ -13,6 +13,6 @@ We use a Raspberry Pi 3b with the GrovePi+ kit.
 # Projet extension
 
 I want to update the project with using an ESP32 instead of the GrovePi : I had several problems with the GrovePi kit that freezes.
-
+sBlabla
 
  
